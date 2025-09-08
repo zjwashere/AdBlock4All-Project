@@ -1,0 +1,28 @@
+{
+    "name": "BrowseGuard V1",
+    "description": "Protecting Online Users Through Ad Blocking",
+    "version": "1.0", 
+    "manifest_version": 3, 
+    "action": {
+        "default_popup": "popup/popup.html", 
+        "default_icon": "icons/tempIcon.png"
+    },
+
+    "permissions":[
+        "declarativeNetRequest"
+    ],
+
+    "declarative_net_request": {
+        "rule_resources": [
+            {
+                "id": "website_ruleset", 
+                "enabled": true,
+                "path": "web_rules.json"
+            }
+        ]
+    },
+
+    "host_permissions": [
+        "<all_urls>"
+    ]
+}
