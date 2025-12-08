@@ -1,118 +1,132 @@
-// Use a persistent storage object to hold the blocked count for each tab ID
-// We'll use chrome.storage.session for non-persistent, per-session data storage.
-// A simple in-memory object (like tabBlockedCounts) can still be used, but
-// chrome.storage.session is safer for a service worker that may be unloaded.
-// For this example, we'll keep the in-memory object for simplicity,
-// but be aware that the service worker may unload, resetting this object.
-const tabBlockedCounts = {};
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.declarativeNetRequest.setExtensionActionOptions({
+    displayActionCountAsBadgeText: true
+  });
+});
 
-// The blocking logic itself must be moved to the Declarative Net Request API
-// This service worker code ONLY handles the counting and badge update,
-// as the service worker cannot use the 'blocking' webRequest capability.
+// Track blocked requests
+let blockedUrls = [];
+const MAX_STORED = 100;
 
-/**
- * Updates the extension badge with the blocked count for the given tab ID.
- * @param {number} tabId
- */
-function updateBadge(tabId) {
-    const count = tabBlockedCounts[tabId] || 0;
+// Load and parse the ABP filter list to check against
+let filterPatterns = [];
 
-    // MV3: Use chrome.action instead of chrome.browserAction
-    chrome.action.setBadgeText({
-        tabId: tabId,
-        text: count > 0 ? count.toString() : ""
-    });
-
-    chrome.action.setBadgeBackgroundColor({
-        tabId: tabId,
-        color: [255, 0, 0, 255]
-    });
+// Load the filter list on extension install/startup
+async function loadFilterList() {
+  try {
+    const response = await fetch(chrome.runtime.getURL('oisd_small_abp.txt'));
+    const content = await response.text();
+    const lines = content.split('\n');
+    
+    filterPatterns = [];
+    
+    for (const line of lines) {
+      // Skip comments, empty lines, and element hiding rules
+      if (!line.trim() || line.startsWith('!') || line.startsWith('[') || 
+          line.includes('##') || line.includes('#@#') || line.startsWith('@@')) {
+        continue;
+      }
+      
+      let filter = line.trim();
+      
+      // Remove options
+      if (filter.includes('$')) {
+        filter = filter.split('$')[0];
+      }
+      
+      // Process the filter
+      filter = filter.replace(/^\|\|/, '').replace(/^\|/, '').replace(/\|$/, '');
+      
+      if (filter) {
+        // Convert to a simple pattern check (not perfect but works for tracking)
+        const pattern = filter.replace(/\*/g, '.*').replace(/\^/g, '');
+        filterPatterns.push(pattern);
+      }
+    }
+    
+    console.log(`Loaded ${filterPatterns.length} filter patterns`);
+  } catch (error) {
+    console.error('Error loading filter list:', error);
+  }
 }
 
-// // --- Counting Logic (Modified for MV3) ---
+// Check if URL matches any filter pattern
+function matchesFilterList(url) {
+  // Simple substring matching for common patterns
+  for (const pattern of filterPatterns) {
+    if (url.includes(pattern.replace(/\.\*/g, ''))) {
+      return true;
+    }
+  }
+  return false;
+}
 
-// // In MV3, the service worker cannot listen for the successful *block* event
-// // from the DNR API to increment the counter directly.
-// // Instead, a common approach for tracking is to have the content script
-// // or a different mechanism report the block, or to rely on a different
-// // metric, or even simplify and remove the counting feature if it's too complex.
+// Shorten URL to max length
+function shortenUrl(url, maxLength = 100) {
+  if (url.length <= maxLength) {
+    return url;
+  }
+  
+  const halfLength = Math.floor((maxLength - 3) / 2);
+  return url.substring(0, halfLength) + '...' + url.substring(url.length - halfLength);
+}
 
-// // Since the original code had an `isAd(details.url)` function,
-// // if that function could be re-used, you *could* check it on *all*
-// // requests, but that's inefficient.
+// Monitor web requests to identify blocked ones
+chrome.webRequest.onBeforeRequest.addListener(
+  (details) => {
+    const url = details.url;
+    
+    // Check if this URL matches our filter list
+    const isBlocked = matchesFilterList(url);
+    
+    if (isBlocked) {
+      // Check if this URL already exists in the list
+      const urlExists = blockedUrls.some(item => item.url === url);
+      
+      if (!urlExists) {
+        const timestamp = new Date().toISOString();
+        const shortenedUrl = shortenUrl(url, 100);
+        
+        blockedUrls.unshift({ url: shortenedUrl, fullUrl: url, timestamp });
+        
+        // Keep only recent entries
+        if (blockedUrls.length > MAX_STORED) {
+          blockedUrls = blockedUrls.slice(0, MAX_STORED);
+        }
+        
+        // Store in chrome.storage for popup access
+        chrome.storage.local.set({ blockedUrls });
+      }
+    }
+  },
+  { urls: ["<all_urls>"] }
+);
 
-// // For this MV3 conversion, we'll assume **counting is a simplified placeholder**
-// // since the primary blocking mechanism is now declarative.
-// // A real-world ad blocker would need a more complex system (e.g., using `webRequest`
-// // with a very broad non-blocking listener, checking all URLs, and applying a filter).
+// Initialize storage and load filter list
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.local.set({ blockedUrls: [] });
+  loadFilterList();
+});
 
-// // --- Workaround for Counting in MV3 (Example using chrome.webRequest) ---
+// Load filter list on startup
+chrome.runtime.onStartup.addListener(() => {
+  loadFilterList();
+});
 
-// // A non-blocking webRequest listener *can* still run in the service worker.
-// // It can check the URL and increment the count *before* the DNR rules are applied.
-// // This is not a perfect count (it counts *potential* blocks, not guaranteed ones),
-// // but it is the closest in-service-worker way to maintain the original intent.
+// Load immediately when service worker starts
+loadFilterList();
 
-// // NOTE: You must include the "webRequest" permission in manifest.json for this listener.
-// chrome.webRequest.onBeforeRequest.addListener(
-//     (details) => {
-//         // Assume 'isAd' is a defined function that returns true for an ad URL
-//         if (isAd(details.url)) { // Keep your blocking rule logic here
-//             const tabId = details.tabId;
-//             if (tabId > 0) {
-//                 tabBlockedCounts[tabId] = (tabBlockedCounts[tabId] || 0) + 1;
-//                 updateBadge(tabId);
-//             }
-//         }
-//         // IMPORTANT: DO NOT return { cancel: true }; in a service worker's non-blocking listener.
-//         // The *actual* blocking is handled by the Declarative Net Request rules.
-//     },
-//     { urls: ["<all_urls>"] } // Listen for all URLs
-//     // MV3: The 'blocking' option MUST BE OMITTED here for the service worker.
-// );
-
-// // Define a placeholder for the ad-checking function (must be implemented by you)
-// function isAd(url) {
-//     // Implement your ad-checking logic here (e.g., check against a blocklist)
-//     return url.includes("doubleclick") || url.includes("adserver");
-// }
-
-
-// // --- Tab State Management (Mostly MV2-compatible) ---
-
-// // Reset count when a tab navigates or is updated
-// chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-//     // If the URL changed, reset the count for the new page
-//     if (changeInfo.url) {
-//         tabBlockedCounts[tabId] = 0;
-//         updateBadge(tabId);
-//     }
-// });
-
-// // Clean up when a tab is closed
-// chrome.tabs.onRemoved.addListener((tabId) => {
-//     delete tabBlockedCounts[tabId];
-// });
-
-// // When the active tab changes, update the badge to show the count for the new active tab
-// chrome.tabs.onActivated.addListener((activeInfo) => {
-//     updateBadge(activeInfo.tabId);
-// });
-
-
-// // --- Popup Communication (MV3 Recommended Structure) ---
-
-// // MV3 Service Worker listens for messages from popup/content scripts
-// chrome.runtime.onMessage.addListener(
-//     (message, sender, sendResponse) => {
-//         if (message.action === "GET_BLOCKED_COUNT" && sender.tab) {
-//             const count = tabBlockedCounts[sender.tab.id] || 0;
-//             sendResponse({ count: count });
-//             return true; // Keep the message channel open for sendResponse
-//         }
-//     }
-// );
-
-chrome.declarativeNetRequest.setExtensionActionOptions({
-  displayActionCountAsBadgeText: true,
+// Listen for messages from popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'getBlockedUrls') {
+    chrome.storage.local.get(['blockedUrls'], (result) => {
+      sendResponse({ blockedUrls: result.blockedUrls || [] });
+    });
+    return true; // Keep channel open for async response
+  } else if (request.action === 'clearBlockedUrls') {
+    blockedUrls = [];
+    chrome.storage.local.set({ blockedUrls: [] });
+    sendResponse({ success: true });
+    return true;
+  }
 });

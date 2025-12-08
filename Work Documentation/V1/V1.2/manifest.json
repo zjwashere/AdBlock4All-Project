@@ -1,6 +1,6 @@
 {
-    "name": "BrowseGuard V1",
-    "description": "Protecting Online Users Through Ad Blocking",
+    "name": "AdBlock4All V1",
+    "description": "Protecting Online Users Through Ad Blocking While Having Fun & Learning",
     "version": "1.2", 
     "manifest_version": 3, 
     "action": {
@@ -10,30 +10,26 @@
 
     "permissions":[
         "declarativeNetRequest",
+        "declarativeNetRequestFeedback",
         "webRequest",
-        "tabs",
         "storage"
     ],
 
     "declarative_net_request": {
         "rule_resources": [
-            {
-                "id": "website_ruleset", 
-                "enabled": false,
-                "path": "web_rules.json"
-            },
-            {
-                "id": "easyList_block",
-                "enabled": false,
-                "path": "easylistrules.json"
-            },
-            {
-                "id": "oisdListBlock",
-                "enabled": true,
-                "path": "smallOisdList.json"
-            }
+        {
+            "id": "ruleset_1",
+            "enabled": true,
+            "path": "rules.json"
+        }
         ]
     },
+  "web_accessible_resources": [
+        {
+        "resources": ["oisd_small_abp.txt"],
+        "matches": ["<all_urls>"]
+        }
+  ],
 
     "background": {
         "service_worker": "background.js"

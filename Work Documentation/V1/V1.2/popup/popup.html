@@ -1,15 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="popup.js"></script>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-    <h1>Hello, we are BrowseGuard</h1>
-    <!--<p>Click below to choose what to block</p>  -->
-    <p>Ads you have blocked: <span id="blockCounter">0</span> </p>
-    
+  <h2>🛡️ Ad Blocker</h2>
+  
+  <div class="stats">
+    <div>
+      <div style="color: #7f8c8d; font-size: 12px;">Blocked Requests</div>
+      <div class="count" id="count">0</div>
+    </div>
+    <div class="controls">
+      <button id="refresh">🔄 Refresh</button>
+      <button id="clear" class="clear">🗑️ Clear</button>
+    </div>
+  </div>
+  
+  <div class="url-list" id="urlList">
+    <div class="empty">No blocked requests yet</div>
+  </div>
+  
+  <script src="popup.js"></script>
 </body>
 </html>
