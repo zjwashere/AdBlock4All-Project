@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  
+  <div class="header-bar">
+    <div class="achievements-tab">Achievements<br>Icons</div>
+    <div class="header-icons">
+      <button class="icon-btn" title="Profile">👤</button>
+      <button class="icon-btn" title="Settings">⚙️</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    
+    <div class="website-link" id="currentDomain">&lt;Scanning...&gt;</div>
+    
+    <div class="blocked-title">Blocked:</div>
+    
+    <div class="stats-container">
+      <div class="stat-row">
+        <strong>Ads:</strong> <span id="adCount">0</span>
+      </div>
+      <div class="stat-row">
+        <strong>Trackers:</strong> <span id="trackerCount">0</span>
+      </div>
+    </div>
+    
+    <div class="rank-display">
+      Rank: #1 in ads blocked
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <button class="footer-btn" id="btnLearnMore">
+      <span>ℹ️</span> Learn More
+    </button>
+    <button class="footer-btn">
+      <span>🏆</span> Leaderboard
+    </button>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
