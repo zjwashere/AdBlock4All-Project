@@ -1,7 +1,7 @@
 {
     "name": "AdBlock4All V1",
     "description": "Protecting Online Users Through Ad Blocking While Having Fun & Learning",
-    "version": "1.3", 
+    "version": "1.4", 
     "manifest_version": 3, 
     "action": {
         "default_popup": "popup/main.html", 
