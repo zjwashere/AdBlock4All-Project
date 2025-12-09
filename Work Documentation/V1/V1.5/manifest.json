@@ -1,0 +1,41 @@
+{
+    "name": "AdBlock4All V1",
+    "description": "Protecting Online Users Through Ad Blocking While Having Fun & Learning",
+    "version": "1.5", 
+    "manifest_version": 3, 
+    "action": {
+        "default_popup": "popup/main.html", 
+        "default_icon": "icons/tempIcon.png"
+    },
+
+    "permissions":[
+        "declarativeNetRequest",
+        "declarativeNetRequestFeedback",
+        "webRequest",
+        "storage"
+    ],
+
+    "declarative_net_request": {
+        "rule_resources": [
+        {
+            "id": "ruleset_1",
+            "enabled": true,
+            "path": "rules.json"
+        }
+        ]
+    },
+  "web_accessible_resources": [
+        {
+        "resources": ["oisd_small_abp.txt"],
+        "matches": ["<all_urls>"]
+        }
+  ],
+
+    "background": {
+        "service_worker": "background.js"
+    } ,
+
+    "host_permissions": [
+        "<all_urls>"
+    ]
+}

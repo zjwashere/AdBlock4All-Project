@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  
+  <div class="back-nav">
+    <button id="goBack" class="back-btn">⬅ Back to Dashboard</button>
+  </div>
+
+  <div class="leaderboard-container">
+    <h2>🏆 Global Leaderboard</h2>
+    
+    <div class="your-rank-section">
+      <div class="your-rank-card">
+        <div class="rank-label">Your Rank</div>
+        <div class="rank-number" id="yourRank">#1</div>
+        <div class="rank-stats">
+          <span id="yourBlocked">0</span> ads blocked
+        </div>
+      </div>
+    </div>
+
+    <div class="leaderboard-tabs">
+      <button class="tab-btn active" data-period="all">All Time</button>
+      <button class="tab-btn" data-period="month">This Month</button>
+      <button class="tab-btn" data-period="week">This Week</button>
+    </div>
+
+    <div class="leaderboard-list" id="leaderboardList">
+      <!-- Leaderboard entries will be inserted here -->
+    </div>
+
+    <div class="leaderboard-note">
+      <p>💡 Keep blocking ads to climb the ranks!</p>
+      <p style="font-size: 11px; color: #999;">Leaderboard updates every hour</p>
+    </div>
+  </div>
+  
+  <script src="leaderboard.js"></script>
+</body>
+</html>

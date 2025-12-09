@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  
+  <div class="back-nav">
+    <button id="goBack" class="back-btn">⬅ Back to Dashboard</button>
+  </div>
+
+  <div class="achievements-container">
+    <h2>🏆 Achievements & Badges</h2>
+    
+    <div class="progress-section">
+      <div class="progress-header">
+        <span>Total Ads Blocked: <strong id="totalBlocked">0</strong></span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="next-badge" id="nextBadge">Next badge at 100 blocks</div>
+    </div>
+
+    <div class="badges-grid" id="badgesGrid">
+      <!-- Badges will be inserted here by JavaScript -->
+    </div>
+  </div>
+  
+  <script src="achievements.js"></script>
+</body>
+</html>

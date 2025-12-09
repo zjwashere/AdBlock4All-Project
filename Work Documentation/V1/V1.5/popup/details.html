@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  
+  <div class="back-nav">
+    <button id="goBack" class="back-btn">⬅ Back to Dashboard</button>
+  </div>
+
+  <div class="url-list-container">
+    <h2>🛡️ Block Log</h2>
+    
+    <div class="stats" style="margin-bottom: 10px;">
+      <div>
+        <div style="color: #7f8c8d; font-size: 12px;">Total Blocked</div>
+        <div class="count" id="count">0</div>
+      </div>
+      <div class="controls">
+        <button id="refresh">🔄</button>
+        <button id="clear" class="clear">🗑️</button>
+      </div>
+    </div>
+    
+    <div class="url-list" id="urlList">
+      <div class="empty">No blocked requests yet</div>
+    </div>
+  </div>
+  
+  <script src="details.js"></script>
+</body>
+</html>
