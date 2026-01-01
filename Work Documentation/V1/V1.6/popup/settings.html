@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  
+  <div class="back-nav">
+    <button id="goBack" class="back-btn">⬅ Back to Dashboard</button>
+  </div>
+
+  <div class="settings-container">
+    <h2>⚙️ Settings</h2>
+    
+    <div class="settings-section">
+      <h3>Statistics</h3>
+      <div class="settings-card">
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="setting-label">Total Ads Blocked</div>
+            <div class="setting-description">All-time blocking statistics</div>
+          </div>
+          <div class="setting-value" id="totalBlockedSetting">0</div>
+        </div>
+        
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="setting-label">Recent Logs</div>
+            <div class="setting-description">Number of recent blocked requests stored</div>
+          </div>
+          <div class="setting-value" id="logsCount">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Data Management</h3>
+      <div class="settings-card">
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="setting-label">Clear Recent Logs</div>
+            <div class="setting-description">Remove all recent blocked URL logs (keeps total count)</div>
+          </div>
+          <button class="setting-btn" id="clearLogsBtn">Clear Logs</button>
+        </div>
+        
+        <div class="setting-item danger-zone">
+          <div class="setting-info">
+            <div class="setting-label">Reset All Statistics</div>
+            <div class="setting-description">⚠️ Clear all data including total blocked count and achievements</div>
+          </div>
+          <button class="setting-btn danger-btn" id="resetAllBtn">Reset All</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Display</h3>
+      <div class="settings-card">
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="setting-label">Extension Badge</div>
+            <div class="setting-description">Shows total blocked count on extension icon</div>
+          </div>
+          <div class="setting-toggle">
+            <label class="toggle-switch">
+              <input type="checkbox" id="showBadgeToggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-footer">
+      <div class="version-info">Ad Blocker Extension v1.0.0</div>
+      <div class="credits">Built with ❤️ for privacy</div>
+    </div>
+  </div>
+  
+  <script src="settings.js"></script>
+</body>
+</html>
