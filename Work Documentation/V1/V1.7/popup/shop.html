@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  
+  <div class="back-nav">
+    <button id="goBack" class="back-btn">⬅ Back to Profile</button>
+  </div>
+
+  <div class="shop-container">
+    <div class="shop-header">
+      <h2>🛒 Shop</h2>
+      <div class="shop-balance">
+        <span>💰 <span id="coinBalance">0</span></span>
+      </div>
+    </div>
+
+    <div class="shop-tabs">
+      <button class="shop-tab active" data-category="all">All Items</button>
+      <button class="shop-tab" data-category="avatars">Profile Icons</button>
+    </div>
+
+    <div class="shop-grid" id="shopGrid">
+      <!-- Shop items will be inserted here by JavaScript -->
+    </div>
+  </div>
+  
+  <script src="shop.js"></script>
+</body>
+</html>

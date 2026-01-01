@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  
+  <div class="back-nav">
+    <button id="goBack" class="back-btn">⬅ Back to Dashboard</button>
+  </div>
+
+  <div class="profile-container">
+    <div class="profile-header">
+      <div class="profile-avatar-section">
+        <div class="profile-avatar">
+          <span id="profileAvatar">👤</span>
+        </div>
+        <div class="profile-level-badge" id="levelBadge">Lv 1</div>
+      </div>
+    </div>
+
+    <div class="profile-stats">
+      <div class="profile-stat-card">
+        <div class="profile-stat-label">Level</div>
+        <div class="profile-stat-value" id="currentLevel">1</div>
+      </div>
+      <div class="profile-stat-card">
+        <div class="profile-stat-label">XP</div>
+        <div class="profile-stat-value xp" id="currentXP">0</div>
+      </div>
+      <div class="profile-stat-card">
+        <div class="profile-stat-label">Coins</div>
+        <div class="profile-stat-value coins" id="currentCoins">0</div>
+      </div>
+      <div class="profile-stat-card">
+        <div class="profile-stat-label">Ads Blocked</div>
+        <div class="profile-stat-value" id="profileBlocked">0</div>
+      </div>
+    </div>
+
+    <div class="xp-progress-section">
+      <div class="xp-progress-header">
+        <span>Progress to Level <span id="nextLevel">2</span></span>
+        <span><span id="xpCurrent">0</span> / <span id="xpNeeded">100</span> XP</span>
+      </div>
+      <div class="xp-bar">
+        <div class="xp-bar-fill" id="xpBarFill"></div>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button class="profile-action-btn primary" id="openShopBtn">
+        <span>🛒</span> Visit Shop
+      </button>
+      <button class="profile-action-btn" id="viewAchievementsBtn">
+        <span>🏆</span> View Achievements
+      </button>
+    </div>
+  </div>
+  
+  <script src="profile.js"></script>
+</body>
+</html>
