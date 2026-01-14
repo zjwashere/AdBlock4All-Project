@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  
+  <div class="back-nav">
+    <button id="goBack" class="back-btn">⬅ Back to Profile</button>
+  </div>
+
+  <div class="share-container">
+    <h2>📤 Share Extension</h2>
+    
+    <div class="share-info-card">
+      <div class="share-icon">🎁</div>
+      <h3>Share & Earn Rewards!</h3>
+      <p>Share AdBlock4All with a friend and earn:</p>
+      <div class="reward-list">
+        <div class="reward-item">
+          <span class="reward-icon">💰</span>
+          <span class="reward-text">100 Coins</span>
+        </div>
+        <div class="reward-item">
+          <span class="reward-icon">⭐</span>
+          <span class="reward-text">300 XP</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="share-form">
+      <div class="form-group">
+        <label for="emailInput">Friend's Email Address</label>
+        <input 
+          type="email" 
+          id="emailInput" 
+          placeholder="friend@example.com"
+          class="email-input"
+        >
+        <div class="email-hint">We'll send them an invitation to try AdBlock4All</div>
+      </div>
+
+      <button class="share-submit-btn" id="shareBtn">
+        <span>📧</span> Send Invitation
+      </button>
+
+      <div class="share-note">
+        <strong>Note:</strong> Rewards are granted immediately upon sending. You can share with multiple friends!
+      </div>
+    </div>
+
+    <div class="share-stats">
+      <div class="share-stat-card">
+        <div class="share-stat-label">Total Shared</div>
+        <div class="share-stat-value" id="totalShared">0</div>
+      </div>
+      <div class="share-stat-card">
+        <div class="share-stat-label">Coins Earned</div>
+        <div class="share-stat-value" id="coinsEarned">0</div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="share.js"></script>
+</body>
+</html>
