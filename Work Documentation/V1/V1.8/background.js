@@ -106,7 +106,7 @@ class LRUCache {
 const filterTrie = new FilterTrie();
 const urlCache = new LRUCache(2000);
 const blockedUrlsByTab = new Map();
-const MAX_STORED_PER_TAB = 100; // Increased from 50 to 100
+const MAX_STORED_PER_TAB = 300; // Increased from 50 to 300
 
 // Batching configuration
 let storageUpdateTimer = null;
