@@ -133,15 +133,15 @@ body {
   z-index: 1;
 }
 
-.profile-level-badge {
+.profile-level-badge-main {
   position: absolute;
-  bottom: -4px;
+  bottom: -1px;
   right: -4px;
   background: #2196F3;
   color: white;
-  font-size: 7px;
+  font-size: 8px;
   font-weight: bold;
-  padding: 1px 4px;
+  padding: 2px 4px;
   border-radius: 6px;
   border: 1.5px solid white;
   z-index: 2;

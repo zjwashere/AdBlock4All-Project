@@ -128,7 +128,7 @@ const XP_PER_AD = 3;
 const COINS_PER_AD = 1;
 
 // Time and Data saved calculations
-const AVG_TIME_PER_AD = 2; // 2 seconds per ad
+const AVG_TIME_PER_AD = 0.12; // 0.12 seconds per ad
 const AVG_DATA_PER_AD = 50; // 50 KB per ad
 
 // ============================================
@@ -428,7 +428,7 @@ chrome.webRequest.onBeforeRequest.addListener(
           'totalDataSaved'
         ], (result) => {
           const newTotal = (result.totalBlockedAllTime || 0) + 1;
-          const newTimeSaved = (result.totalTimeSaved || 0) + AVG_TIME_PER_AD;
+          const newTimeSaved = ((result.totalTimeSaved || 0) + AVG_TIME_PER_AD).toFixed(2);
           const newDataSaved = (result.totalDataSaved || 0) + AVG_DATA_PER_AD;
           
           chrome.storage.local.set({ 
