@@ -1,12 +1,6 @@
 // ============================================
-// OPTIMIZED BACKGROUND.JS
-// Key Improvements:
-// 1. Reduced memory usage with better caching
-// 2. Batched operations for better performance
-// 3. Optimized Trie structure
-// 4. Efficient event handling
-// 5. Added time saved and data saved tracking
-// 6. Added daily streak tracking
+// FIXED BACKGROUND.JS
+// Key Fix: Proper syncing between Map and storage for accurate counts
 // ============================================
 
 class TrieNode {
@@ -107,15 +101,14 @@ class LRUCache {
 }
 
 // ============================================
-// OPTIMIZED STATE MANAGEMENT
+// STATE MANAGEMENT
 // ============================================
 const filterTrie = new FilterTrie();
 const urlCache = new LRUCache(2000);
 const blockedUrlsByTab = new Map();
-const MAX_STORED_PER_TAB = 50;
+const MAX_STORED_PER_TAB = 100; // Increased from 50 to 100
 
 // Batching configuration
-let pendingStorageUpdates = new Set();
 let storageUpdateTimer = null;
 const STORAGE_BATCH_DELAY = 1000;
 
@@ -143,20 +136,17 @@ function checkAndUpdateStreak() {
     const lastActive = result.lastActiveDate || '';
     
     if (lastActive === today) {
-      return; // Already updated today
+      return;
     }
     
     const yesterday = new Date(Date.now() - 86400000).toDateString();
     let newStreak = result.dailyStreak || 0;
     
     if (lastActive === yesterday) {
-      // Continue streak
       newStreak++;
     } else if (lastActive === '') {
-      // First time
       newStreak = 1;
     } else {
-      // Streak broken
       newStreak = 1;
     }
     
@@ -167,11 +157,10 @@ function checkAndUpdateStreak() {
   });
 }
 
-// Check streak on first block of the day
 let streakCheckedToday = false;
 
 // ============================================
-// OPTIMIZED FILTER LOADING
+// FILTER LOADING
 // ============================================
 async function loadFilterList() {
   console.time('FilterList Load');
@@ -183,8 +172,8 @@ async function loadFilterList() {
     
     let loaded = 0;
     const categorizers = [
-      { regex: /(track|analytics|pixel|beacon|telemetry|collect)/i, category: 'Tracker' },
-      { regex: /(ad|banner|popup|sponsor)/i, category: 'Ad' }
+      { regex: /(track|analytics|analytic|pixel|beacon|telemetry|collect|metric|stats|statistic|counter|logger|logging|monitor|telemetrics|insight|heatmap|mouseflow|clicktale|usabilla|hotjar|mixpanel|segment|amplitude|heap|fullstory|smartlook|inspectlet|quantcast|comscore|chartbeat|parsely|snowplow|matomo|piwik|kissmetrics|clicky|woopra|crazy-egg|optimizely|vwo|google-analytics|googletagmanager|gtag|doubleclick|criteo-analytics|facebook-pixel|fbevents|pinterest-tag|twitter-pixel|linkedin-insight|reddit-pixel|tiktok-pixel|snapchat-pixel|omniture|adobe-analytics|sitestat|webtrekk|atinternet|eulerian|xiti|gemius|navegg|retailrocket|conviva|youbora|nice264|streamsense|moat|ias|doubleverify|integral-ad-science|scorecard|newrelic|sentry|bugsnag|rollbar|airbrake|raygun|trackjs|errorception|honeybadger)/i, category: 'Tracker' },
+      { regex: /(advert|banner|popup|sponsor|promo|promotion|affiliate|monetize|adsense|adserver|adservice|adslot|adunit|admob|inmobi|mopub|applovin|chartboost|vungle|unity-ads|ironsource|adcolony|tapjoy|fyber|smaato|pubmatic|rubicon|openx|appnexus|indexexchange|sovrn|triplelift|teads|outbrain|taboola|revcontent|mgid|plista|ligatus|adblade|content\.ad|zone|doubleclick|googlesyndication|googleadservices|amazon-adsystem|casalemedia|advertising\.com|adnxs|rubiconproject|contextweb|advertising|bidswitch|spotx|smartadserver|improvedigital|yieldmo|adform|undertone|conversant|sharethrough|nativo|mediamath|turn\.com|criteo|adroll|retargeter|adtech|exponential|tribal|33across|sonobi|districtm|gumgum|kargo|lockerdome|nanointeractive|beachfront|trustx|rhythmone|emxdigital)/i, category: 'Ad' }
     ];
     
     const CHUNK_SIZE = 1000;
@@ -229,7 +218,7 @@ async function loadFilterList() {
 }
 
 // ============================================
-// OPTIMIZED URL CHECKING
+// URL CHECKING
 // ============================================
 function checkUrlBlocked(url) {
   if (urlCache.has(url)) {
@@ -243,7 +232,7 @@ function checkUrlBlocked(url) {
 }
 
 // ============================================
-// URL SHORTENING WITH CACHE
+// URL SHORTENING
 // ============================================
 const urlShortener = (() => {
   const cache = new Map();
@@ -271,37 +260,31 @@ const urlShortener = (() => {
 })();
 
 // ============================================
-// BATCHED STORAGE UPDATES
+// FIXED: PROPER STORAGE SYNC
 // ============================================
-function scheduleBatchedStorageUpdate(tabId) {
-  pendingStorageUpdates.add(tabId);
+function saveBlockedUrlsToStorage() {
+  const dataToStore = {};
   
+  blockedUrlsByTab.forEach((tabData, tabId) => {
+    dataToStore[tabId] = tabData;
+  });
+  
+  chrome.storage.local.set({ blockedUrlsByTab: dataToStore });
+}
+
+function scheduleStorageUpdate() {
   if (storageUpdateTimer) {
-    return;
+    clearTimeout(storageUpdateTimer);
   }
   
   storageUpdateTimer = setTimeout(() => {
-    flushStorageUpdates();
+    saveBlockedUrlsToStorage();
     storageUpdateTimer = null;
   }, STORAGE_BATCH_DELAY);
 }
 
-function flushStorageUpdates() {
-  if (pendingStorageUpdates.size === 0) return;
-  
-  const dataToStore = {};
-  pendingStorageUpdates.forEach(tabId => {
-    if (blockedUrlsByTab.has(tabId)) {
-      dataToStore[tabId] = blockedUrlsByTab.get(tabId);
-    }
-  });
-  
-  chrome.storage.local.set({ blockedUrlsByTab: dataToStore });
-  pendingStorageUpdates.clear();
-}
-
 // ============================================
-// DEBOUNCED BADGE UPDATES
+// BADGE UPDATES
 // ============================================
 function updateBadgeForTab(tabId) {
   if (badgeUpdateTimers.has(tabId)) {
@@ -345,7 +328,7 @@ function updateBadgeForTab(tabId) {
 }
 
 // ============================================
-// BATCHED XP/COINS UPDATES
+// XP/COINS UPDATES
 // ============================================
 let xpCoinsUpdateTimer = null;
 let pendingXPCoins = { xp: 0, coins: 0 };
@@ -374,7 +357,7 @@ function awardXPAndCoins() {
 }
 
 // ============================================
-// WEB REQUEST HANDLER
+// WEB REQUEST HANDLER - FIXED
 // ============================================
 chrome.webRequest.onBeforeRequest.addListener(
   (details) => {
@@ -385,7 +368,6 @@ chrome.webRequest.onBeforeRequest.addListener(
     chrome.storage.local.get(['adBlockerEnabled'], (result) => {
       if (result.adBlockerEnabled === false) return;
       
-      // Check streak on first block
       if (!streakCheckedToday) {
         checkAndUpdateStreak();
         streakCheckedToday = true;
@@ -398,16 +380,20 @@ chrome.webRequest.onBeforeRequest.addListener(
         const shortenedUrl = urlShortener(url, 100);
         const category = matchResult.category || 'Ad';
         
+        // Initialize tab data if needed
         if (!blockedUrlsByTab.has(tabId)) {
           blockedUrlsByTab.set(tabId, {
             domain: '',
             urls: [],
-            totalCount: 0
+            totalCount: 0,
+            adCount: 0,
+            trackerCount: 0
           });
         }
         
         const tabData = blockedUrlsByTab.get(tabId);
         
+        // Add to URL list (capped at MAX_STORED_PER_TAB)
         if (tabData.urls.length < MAX_STORED_PER_TAB) {
           tabData.urls.unshift({ 
             url: shortenedUrl, 
@@ -417,19 +403,32 @@ chrome.webRequest.onBeforeRequest.addListener(
           });
         }
         
+        // ALWAYS increment total count and category counts
         tabData.totalCount++;
+        if (category === 'Tracker') {
+          tabData.trackerCount = (tabData.trackerCount || 0) + 1;
+        } else {
+          tabData.adCount = (tabData.adCount || 0) + 1;
+        }
         
-        scheduleBatchedStorageUpdate(tabId);
+        // Save to storage
+        scheduleStorageUpdate();
         
-        // Update total blocked and statistics
+        // Update global total and statistics - SIMPLIFIED
         chrome.storage.local.get([
           'totalBlockedAllTime',
           'totalTimeSaved',
           'totalDataSaved'
         ], (result) => {
           const newTotal = (result.totalBlockedAllTime || 0) + 1;
-          const newTimeSaved = ((result.totalTimeSaved || 0) + AVG_TIME_PER_AD).toFixed(2);
-          const newDataSaved = (result.totalDataSaved || 0) + AVG_DATA_PER_AD;
+          const currentTimeSaved = result.totalTimeSaved || 0;
+          const currentDataSaved = result.totalDataSaved || 0;
+          
+          // Add the increments
+          const newTimeSaved = currentTimeSaved + AVG_TIME_PER_AD;
+          const newDataSaved = currentDataSaved + AVG_DATA_PER_AD;
+          
+          console.log('Time saved update:', currentTimeSaved, '+', AVG_TIME_PER_AD, '=', newTimeSaved);
           
           chrome.storage.local.set({ 
             totalBlockedAllTime: newTotal,
@@ -451,7 +450,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 // ============================================
 chrome.tabs.onRemoved.addListener((tabId) => {
   blockedUrlsByTab.delete(tabId);
-  pendingStorageUpdates.delete(tabId);
+  scheduleStorageUpdate();
   
   if (badgeUpdateTimers.has(tabId)) {
     clearTimeout(badgeUpdateTimers.get(tabId));
@@ -472,17 +471,20 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
           blockedUrlsByTab.set(tabId, {
             domain: newDomain,
             urls: [],
-            totalCount: 0
+            totalCount: 0,
+            adCount: 0,
+            trackerCount: 0
           });
-          scheduleBatchedStorageUpdate(tabId);
+          scheduleStorageUpdate();
           updateBadgeForTab(tabId);
         }
       } else {
-        // Initialize with domain
         blockedUrlsByTab.set(tabId, {
           domain: newDomain,
           urls: [],
-          totalCount: 0
+          totalCount: 0,
+          adCount: 0,
+          trackerCount: 0
         });
       }
     } catch (e) {
@@ -523,8 +525,8 @@ chrome.runtime.onInstalled.addListener(() => {
     chrome.storage.local.set({ 
       blockedUrlsByTab: {},
       totalBlockedAllTime: totalBlocked,
-      totalTimeSaved: result.totalTimeSaved || totalBlocked * AVG_TIME_PER_AD,
-      totalDataSaved: result.totalDataSaved || totalBlocked * AVG_DATA_PER_AD,
+      totalTimeSaved: result.totalTimeSaved !== undefined ? result.totalTimeSaved : (totalBlocked * AVG_TIME_PER_AD),
+      totalDataSaved: result.totalDataSaved !== undefined ? result.totalDataSaved : Math.round(totalBlocked * AVG_DATA_PER_AD),
       showBadge: result.showBadge !== false,
       userXP: result.userXP !== undefined ? result.userXP : totalBlocked * XP_PER_AD,
       userCoins: result.userCoins !== undefined ? result.userCoins : totalBlocked * COINS_PER_AD,
@@ -551,6 +553,7 @@ chrome.runtime.onStartup.addListener(() => {
   loadFilterList();
   streakCheckedToday = false;
   
+  // Load blocked URLs from storage into Map
   chrome.storage.local.get(['blockedUrlsByTab'], (result) => {
     const stored = result.blockedUrlsByTab || {};
     
@@ -568,10 +571,10 @@ chrome.runtime.onStartup.addListener(() => {
 // Reset streak check daily
 setInterval(() => {
   streakCheckedToday = false;
-}, 86400000); // 24 hours
+}, 86400000);
 
 // ============================================
-// MESSAGE HANDLERS
+// MESSAGE HANDLERS - FIXED
 // ============================================
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'getBlockedUrlsForTab') {
@@ -587,13 +590,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse({ 
         blockedUrls: urls,
         domain: tabData.domain,
-        totalCount: tabData.totalCount || 0
+        totalCount: tabData.totalCount || 0,
+        adCount: tabData.adCount || 0,
+        trackerCount: tabData.trackerCount || 0
       });
     } else {
       sendResponse({ 
         blockedUrls: [],
         domain: '',
-        totalCount: 0
+        totalCount: 0,
+        adCount: 0,
+        trackerCount: 0
       });
     }
     return true;
@@ -603,8 +610,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     
     if (blockedUrlsByTab.has(tabId)) {
       const tabData = blockedUrlsByTab.get(tabId);
+      // Only clear the URLs array, keep totalCount
       tabData.urls = [];
-      scheduleBatchedStorageUpdate(tabId);
+      scheduleStorageUpdate();
     }
     
     sendResponse({ success: true });
@@ -638,7 +646,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.action === 'resetAllData') {
     blockedUrlsByTab.clear();
     urlCache.cache.clear();
-    pendingStorageUpdates.clear();
     
     chrome.storage.local.set({ 
       blockedUrlsByTab: {},
@@ -675,7 +682,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
     
   } else if (request.action === 'shareExtension') {
-    // Award sharing bonus
     chrome.storage.local.get(['userXP', 'userCoins'], (result) => {
       chrome.storage.local.set({
         userXP: (result.userXP || 0) + 300,
@@ -689,11 +695,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 // ============================================
-// CLEANUP ON UNLOAD
+// CLEANUP
 // ============================================
 self.addEventListener('unload', () => {
-  if (pendingStorageUpdates.size > 0) {
-    flushStorageUpdates();
+  if (storageUpdateTimer) {
+    clearTimeout(storageUpdateTimer);
+    saveBlockedUrlsToStorage();
   }
 });
 
