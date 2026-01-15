@@ -139,14 +139,15 @@ body {
   right: -4px;
   background: #2196F3;
   color: white;
-  font-size: 9px;
+  font-size: 7px;
   font-weight: bold;
-  padding: 2px 5px;
-  border-radius: 8px;
-  border: 2px solid white;
+  padding: 1px 4px;
+  border-radius: 6px;
+  border: 1.5px solid white;
   z-index: 2;
-  min-width: 18px;
+  min-width: 14px;
   text-align: center;
+  line-height: 1.2;
 }
 
 /* --- Main Content --- */
